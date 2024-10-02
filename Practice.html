@@ -1,67 +1,153 @@
 <!DOCTYPE html>
 <html lang="zh-CN" class="gray">
-    <head>
-        <!-- 确保正确显示 -->
-        <meta charset="UTF-8">
+<head>
+    <!-- 确保正确显示 -->
+    <meta charset="UTF-8">
 
-        <!-- 视口 改善外观 -->
-        <meta name="viewpoint" content="width = device-width,initial-scale=1.0">
+    <!-- 视口 改善外观 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        <!-- 关键字 -->
-        <meta name="keywords" content="simple">
+    <!-- 关键字 -->
+    <meta name="keywords" content="simple">
 
-        <!-- 网页描述-->
-        <meta name="description" content="this is a small webpage that made for a task about video">
+    <!-- 网页描述 -->
+    <meta name="description" content="this is a small webpage that made for a task about video">
 
-        <!-- 600s refresh -->
-        <meta http-equiv="refresh" content="600">
+    <!-- 600s 刷新 -->
+    <meta http-equiv="refresh" content="600">
 
-        <meta http-equiv="x-UA-Compatible" content="IE=edge">
-        <title>
-            Welcome to our Small Webpage
-        </title>
-    </head>
-    <body>
-        <h1>
-            <span style="background-color:beige;">基于<span style="color: chocolate;">大模型和语音识别</span>的<span style="color:brown;">网课视频概要总结</span></span>
-        </h1>
-        <p>
-            <span style="background-color: aliceblue;">该系统支持上传视频并显示生成的字幕、时间轴、大纲等相关功能</span>
-        </p>
+    <meta http-equiv="x-UA-Compatible" content="IE=edge">
+    <title>Welcome to our Small Webpage</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('https://img.zcool.cn/community/01bb62571600ba32f8758c9b79b318.jpg@2o.jpg') no-repeat center center fixed; /* 背景图 */
+            background-size: cover;
+            color: #fff;
+        }
+        .container {
+            max-width: 960px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8); /* 半透明背景 */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        h1, p {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        input[type="file"], button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="file"] {
+            background-color: #f1f1f1;
+            margin-right: 10px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            padding: 5px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>
+                基于<span style="color: chocolate;">大模型和语音识别</span>的<span style="color:brown;">网课视频概要总结</span>
+            </h1>
+            <p>
+                该系统支持上传视频并显示生成的字幕、时间轴、大纲等相关功能
+            </p>
+        </header>
 
-        <!-- 上传视频 -->
-        <form id="uploadForm" enctype="multipart/form-data">
-            <input type="file" id="fiileInput" accept="video/*">
-            <button type="button" onclick="uploadVideo()">上传视频</button>
-        </form>
+         <!-- 上传视频 -->
+        <section aria-label="上传视频区域">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="fileInput" accept="video/*">
+                <button type="button" onclick="uploadVideo()">上传视频</button>
+            </form>
+        </section>
 
         <!-- 播放视频 -->
-        <video id="videoPlayer" controls>
-            <track id="subtitleTrack" kind="subtitles" srclang="en" label="English">
-        </video>
+        <section aria-label="播放视频区域">
+            <video id="videoPlayer" controls>
+                <track id="subtitleTrack" kind="subtitles" srclang="zh-CN" label="Chinese">
+            </video>
+        </section>
 
         <!-- 字幕按钮 -->
-        <button onclick="generateSubtitles()">生成字幕</button>
+        <section aria-label="字幕生成按钮">
+            <button onclick="generateSubtitles()">生成字幕</button>
+        </section>
 
         <!-- 显示大纲 -->
-        <div id="outline">
+        <section aria-label="大纲显示区域">
             <h2>大纲</h2>
             <ul id="outlineList"></ul>
-        </div>
+        </section>
 
-        <script>
-            function uploadVideo(){
-                const input = document.getElementById("fileInput").file[0];
-                const video = document.getElementById("videoPlayer");
+        <!-- 显示时间轴 -->
+        <section aria-label="时间轴显示区域">
+            <h2>时间轴</h2>
+            <ul id="timelineList"></ul>
+        </section>
+    </main>
 
-                const objectURL = URL.createObjectURL(input);
+    <script>
+        function uploadVideo() { // 视频上传
+            const fileInput = document.getElementById("fileInput");
+            const video = document.getElementById("videoPlayer");
+
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const objectURL = URL.createObjectURL(file);
                 video.src = objectURL;
+            } else {
+                alert("请选择一个视频文件进行上传。");
             }
+        }
 
-            function generateSubtitles(){
-                const subtitleTrack = document.getElementById("subtitleTrack");
-                subtitleTrack.src = "substitle.srt";
-            }
-        </script>
-    </body>
+        function generateSubtitles() { // 字幕生成
+            const subtitleTrack = document.getElementById("subtitleTrack");
+            // 可用的 SRT 文件
+            subtitleTrack.src = "subtitle.srt";
+            subtitleTrack.mode = "showing";
+        }
+    </script>
+</body>
 </html>
