@@ -8,10 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- 关键字 -->
-    <meta name="keywords" content="simple">
+    <meta name="keywords" content="video, subtitles, outline, timeline, speech recognition">
 
     <!-- 网页描述 -->
-    <meta name="description" content="this is a small webpage that made for a task about video">
+    <meta name="description" content="基于大模型和语音识别的网课视频概要总结">
 
     <!-- 600s 刷新 -->
     <meta http-equiv="refresh" content="600">
@@ -19,7 +19,7 @@
     <meta http-equiv="x-UA-Compatible" content="IE=edge">
     <title>Welcome to our Small Webpage</title>
     <style>
-        body { 
+        body {
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
@@ -31,13 +31,14 @@
             max-width: 960px;
             margin: 20px auto;
             padding: 20px;
-            background-color: rgba(255, 255, 255, 0.8); /* 半透明背景 */
+            background-color: rgba(255, 255, 255, 0.85); /* 背景的透明度 */
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
         h1, p {
             text-align: center;
-            color: #333;
+            color: #2c3e50;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* 文字阴影 */
         }
         form {
             display: flex;
@@ -52,11 +53,13 @@
         }
         input[type="file"] {
             background-color: #f1f1f1;
+            color: #333; 
             margin-right: 10px;
         }
         button {
             background-color: #007BFF;
             color: white;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); 
         }
         button:hover {
             background-color: #0056b3;
@@ -70,12 +73,14 @@
         ul {
             list-style-type: none;
             padding: 0;
+            color: #333; 
         }
         li {
             padding: 5px;
-            background-color: #f1f1f1;
+            background-color: rgba(255, 255, 255, 0.8);
             border-radius: 5px;
             margin-bottom: 5px;
+            color: #333; 
         }
         @media screen and (max-width: 768px) {
             .container {
@@ -87,67 +92,80 @@
 <body>
     <main class="container">
         <header>
-            <h1>
-                基于<span style="color: chocolate;">大模型和语音识别</span>的<span style="color:brown;">网课视频概要总结</span>
-            </h1>
-            <p>
-                该系统支持上传视频并显示生成的字幕、时间轴、大纲等相关功能
-            </p>
+            <h1>基于<span style="color: chocolate;">大模型和语音识别</span>的<span style="color:brown;">网课视频概要总结</span></h1>
+            <p>支持上传视频并生成字幕、时间轴、大纲等相关功能</p>
         </header>
 
-         <!-- 上传视频 -->
-        <section aria-label="上传视频区域">
-            <form id="uploadForm" enctype="multipart/form-data">
+        <!-- 上传视频 -->
+        <section aria-label="视频上传区">
+            <form id="uploadForm">
                 <input type="file" id="fileInput" accept="video/*">
                 <button type="button" onclick="uploadVideo()">上传视频</button>
             </form>
         </section>
 
         <!-- 播放视频 -->
-        <section aria-label="播放视频区域">
+        <section aria-label="视频播放区">
             <video id="videoPlayer" controls>
                 <track id="subtitleTrack" kind="subtitles" srclang="zh-CN" label="Chinese">
             </video>
         </section>
 
-        <!-- 字幕按钮 -->
-        <section aria-label="字幕生成按钮">
-            <button onclick="generateSubtitles()">生成字幕</button>
+        <!-- 选择字幕文件 -->
+        <section aria-label="字幕文件选择区">
+            <h2 style="color: #2c3e50;">选择字幕文件（.vtt 或 .srt）</h2>
+            <form>
+                <input type="file" id="subtitleInput" accept=".vtt, .srt">
+                <button type="button" onclick="uploadSubtitles()">加载字幕</button>
+            </form>
         </section>
 
         <!-- 显示大纲 -->
-        <section aria-label="大纲显示区域">
-            <h2>大纲</h2>
+        <section aria-label="大纲显示区">
+            <h2 style="color: #2c3e50;">大纲</h2>
             <ul id="outlineList"></ul>
         </section>
 
         <!-- 显示时间轴 -->
-        <section aria-label="时间轴显示区域">
-            <h2>时间轴</h2>
+        <section aria-label="时间轴显示区">
+            <h2 style="color: #2c3e50;">时间轴</h2>
             <ul id="timelineList"></ul>
         </section>
     </main>
 
     <script>
-        function uploadVideo() { // 视频上传
+        // 上传视频并播放
+        function uploadVideo() {
             const fileInput = document.getElementById("fileInput");
-            const video = document.getElementById("videoPlayer");
+            const videoPlayer = document.getElementById("videoPlayer");
 
-            if (fileInput.files.length > 0) {
-                const file = fileInput.files[0];
-                const objectURL = URL.createObjectURL(file);
-                video.src = objectURL;
+            if (fileInput.files.length) {
+                videoPlayer.src = URL.createObjectURL(fileInput.files[0]);
             } else {
                 alert("请选择一个视频文件进行上传。");
             }
         }
 
-        function generateSubtitles() { // 字幕生成
+        // 加载字幕文件 (.vtt 或 .srt)
+        function uploadSubtitles() {
+            const subtitleInput = document.getElementById("subtitleInput");
             const subtitleTrack = document.getElementById("subtitleTrack");
-            // 可用的 SRT 文件
-            subtitleTrack.src = "subtitle.srt";
-            subtitleTrack.mode = "showing";
+
+            if (subtitleInput.files.length) {
+                const file = subtitleInput.files[0];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+
+                if (['vtt', 'srt'].includes(fileExtension)) {
+                    subtitleTrack.src = URL.createObjectURL(file);
+                    subtitleTrack.mode = "showing"; // 显示字幕
+                } else {
+                    alert("请上传 .vtt 或 .srt 格式的字幕文件。");
+                }
+            } else {
+                alert("请选择一个字幕文件进行上传。");
+            }
         }
     </script>
 </body>
 </html>
+
